@@ -11,11 +11,6 @@ label_texts = set(dataset["train"]["label_text"])
 print(label_texts)
 print(f"Number of unique label_texts: {len(label_texts)}")
 
-# Count the occurrences of each label_text in the training set
-label_counts = Counter(dataset["train"]["label_text"])
-
-# Print the label counts
-print(f"Label counts:\n{label_counts}")
 
 # Print a few examples of customer messages and their corresponding categories
 seen_examples = set()
@@ -26,3 +21,16 @@ for example in dataset["train"]:
         seen_examples.add(example["label_text"])
     if len(seen_examples    ) == 5:
         break
+
+# Count the occurrences of each label_text in the training set
+label_counts = Counter(dataset["train"]["label_text"])
+
+# Print the label counts
+print(f"Label counts:\n{label_counts}")
+print(label_counts.most_common(1))  # Print the most common labels
+print(label_counts.most_common()[-1])  # Print the least common labels
+
+# Calculate the average number of examples per label
+average_examples_per_label = len(dataset["train"]) / len(label_texts)
+print(f"Average number of examples per label: {average_examples_per_label}")
+
