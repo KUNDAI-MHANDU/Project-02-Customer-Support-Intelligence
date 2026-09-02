@@ -13,6 +13,6 @@ vectorizer = TfidfVectorizer()
 # Fit the vectorizer to the sentences and transform them into TF-IDF features
 X = vectorizer.fit_transform(sentences)
 
-# TF-IDF feature matrix
+# Print the TF-IDF feature matrix
 print(vectorizer.get_feature_names_out())
 print(X.toarray())
