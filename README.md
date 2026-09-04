@@ -104,6 +104,17 @@ I learned the difference between sparse TF-IDF vectors and dense pretrained sent
 
 In this project, replacing TF-IDF with MiniLM embeddings improved Linear SVM accuracy from 89.47% to 92.95%.
 
+After performing error analysis on the MiniLM embeddings + Linear SVM model, I found that some of the previously weak categories improved compared with the TF-IDF + Linear SVM baseline.
+
+For example:
+
+- `balance_not_updated_after_bank_transfer`
+  - TF-IDF + Linear SVM: F1 ≈ 0.72
+  - MiniLM + Linear SVM: F1 ≈ 0.79
+
+This showed me that pretrained semantic embeddings can help the classifier better distinguish between customer intents that have similar wording but different meanings.
+
+
 ## Next Steps
 
 - Perform error analysis on the MiniLM embedding classifier
