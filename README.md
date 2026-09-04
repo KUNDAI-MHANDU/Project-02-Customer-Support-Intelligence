@@ -17,19 +17,17 @@ The current goal is to classify customer-support messages into the correct inten
 
 ## Current Approach
 
-The project currently compares two approaches for representing customer-support messages numerically:
+The project currently uses pretrained sentence embeddings generated using `all-MiniLM-L6-v2` to represent customer-support messages as 384-dimensional dense vectors.
 
-- TF-IDF text features
-- Pretrained MiniLM sentence embeddings
+A Linear SVM classifier is trained on these embeddings to classify messages into one of the 77 Banking77 intents.
 
-For classical machine learning, I compared:
+The project also uses `CalibratedClassifierCV` with Linear SVM to generate calibrated probability estimates that can be used as confidence scores.
 
-- Logistic Regression
-- Linear SVM
+The trained classifier and label mapping are saved using `joblib`, allowing the application to perform inference without retraining the model every time it starts.
 
-TF-IDF + Linear SVM was selected as the best classical baseline.
+A reusable `predict_intent()` function loads the saved model and returns both the predicted intent and confidence score.
 
-I then replaced TF-IDF with pretrained semantic embeddings generated using `all-MiniLM-L6-v2`. MiniLM embeddings combined with Linear SVM currently produce the best performance.
+The prediction system is exposed through a FastAPI REST API using a `POST /predict` endpoint.
 
 
 ## Current Results
@@ -38,9 +36,12 @@ I then replaced TF-IDF with pretrained semantic embeddings generated using `all-
 |---|---|---:|---:|
 | TF-IDF | Logistic Regression | 87.78% | 87.77% |
 | TF-IDF | Linear SVM | 89.47% | 89.45% |
-| **MiniLM Embeddings** | **Linear SVM** | **92.95%** | **92.91%** |
+| MiniLM Embeddings | Linear SVM | **92.95%** | **92.91%** |
+| MiniLM Embeddings | Calibrated Linear SVM | 92.88% | 92.85% |
 
-MiniLM embeddings combined with Linear SVM currently achieve the best performance, with 92.95% accuracy and 92.91% Macro F1.
+MiniLM embeddings combined with Linear SVM achieved the highest classification performance.
+
+The calibrated version produced nearly identical classification performance while also providing probability-based confidence estimates for predictions.
 
 
 ## Experiments
@@ -81,6 +82,21 @@ Using pretrained sentence embeddings improved accuracy from 89.47% to 92.95% com
 
 The MiniLM embedding model is currently the best-performing approach.
 
+## API
+
+The intent-classification system is exposed through a FastAPI REST API.
+
+### Endpoint
+
+`POST /predict`
+
+Example request:
+
+```json
+{
+  "text": "My virtual card keeps getting declined"
+}
+
 ## What I Learned
 
 I learned that machine-learning models cannot directly process customer messages as text, so the text first needs to be converted into numerical features.
@@ -114,13 +130,22 @@ For example:
 
 This showed me that pretrained semantic embeddings can help the classifier better distinguish between customer intents that have similar wording but different meanings.
 
+I learned the difference between model training and inference. Training creates the classifier using the training dataset, while inference loads the saved classifier and uses it to make predictions on new customer messages without retraining.
+
+I learned how to persist trained machine-learning models using `joblib` and load them later for production inference.
+
+I also learned that Linear SVM decision scores are not probabilities. I used `CalibratedClassifierCV` to generate probability-based confidence estimates while maintaining similar classification performance.
+
+I learned how to expose a machine-learning model through a FastAPI REST API, validate incoming JSON requests with Pydantic, and return model predictions as JSON responses.
+
 
 ## Next Steps
 
-- Add confidence scoring
-- Save and load the trained model
-- Build an API using FastAPI
-- Store customer-support tickets in a database
+- Add input validation and error handling
+- Add automated API and inference tests
+- Store customer-support tickets and predictions in PostgreSQL
 - Add priority classification
-- Add LLM/RAG capabilities
-- Deploy the system
+- Add routing logic for support departments
+- Add LLM/RAG capabilities for generating support assistance
+- Containerize the application with Docker
+- Deploy the API

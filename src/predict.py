@@ -15,8 +15,6 @@ def predict_intent(message):
 
     # Get the predicted class and the predicted probabilities for each class for the message
     prediction = classifier.predict(message_embedding)[0]
-
-    # Get the predicted probabilities for each class for the message
     probabilities = classifier.predict_proba(message_embedding)[0]
 
     # Get the position of the predicted class in the list of classes and calculate the confidence score for the prediction
@@ -34,11 +32,12 @@ def predict_intent(message):
         "confidence": confidence
     }
 
-# Test the predict_intent function with a sample message and print the results
-message = "The person I sent money to yesterday still has not received it"
-result = predict_intent(message)
+# Test the predict_intent function with a sample message
+if __name__ == "__main__":
+    message = "The person I sent money to yesterday still has not received it"
 
-print(f"Customer message: {message}")
-print(result)
-print(f"Predicted category: {result['intent']}")
-print(f"Confidence: {result['confidence']:.2%}")
+    result = predict_intent(message)
+
+    print(f"Customer message: {message}")
+    print(f"Predicted category: {result['intent']}")
+    print(f"Confidence: {result['confidence']:.2%}")
