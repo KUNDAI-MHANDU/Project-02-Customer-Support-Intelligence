@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
+import joblib
 
 # Load the banking77 dataset
 dataset = load_dataset("mteb/banking77")
@@ -83,6 +84,14 @@ label_map = dict(
         dataset["train"]["label_text"]
     )
 )
+
+# Save the label map to a file using joblib
+joblib.dump(
+    label_map,
+    "models/label_map.joblib"
+)
+
+print("\nLabel map saved to models/label_map.joblib")
 
 # Print a few examples of customer messages and their corresponding categories
 print("\nCustomer message:", X_test_text[0])

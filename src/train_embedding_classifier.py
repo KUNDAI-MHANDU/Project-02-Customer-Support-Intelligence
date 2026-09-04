@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer
 from datasets import load_dataset
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, classification_report
+import joblib
 
 # Load the banking77 dataset
 dataset = load_dataset("mteb/banking77")
@@ -31,6 +32,9 @@ X_test = model.encode(
 
 # Fit the LinearSVC classifier to the training embeddings and make predictions on the test embeddings
 classifier.fit(X_train, y_train)
+
+# Save the trained LinearSVC classifier to a file using joblib
+joblib.dump(classifier, "models/intent_classifier.joblib")
 
 # Make predictions on the test embeddings
 y_pred = classifier.predict(X_test)
@@ -99,3 +103,18 @@ for i in range(len(y_test)):
 
     if svm_mistakes_found == 5:
         break
+
+new_message = [
+    "My virtual card keeps getting declined when I try to use it"
+]
+
+# Encode the new message into embeddings using the SentenceTransformer model
+new_message_embedding = model.encode(new_message)
+
+# Make a prediction for the new message using the trained LinearSVC classifier
+new_message_prediction = classifier.predict(new_message_embedding)
+
+# Print the predicted category for the new message
+print("\nPredicted category for the new message:")
+print("\nMessage:", new_message[0])
+print(label_map[new_message_prediction[0]])
