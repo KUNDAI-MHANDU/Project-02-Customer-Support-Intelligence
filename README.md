@@ -117,8 +117,6 @@ This showed me that pretrained semantic embeddings can help the classifier bette
 
 ## Next Steps
 
-- Perform error analysis on the MiniLM embedding classifier
-- Compare weak categories against the TF-IDF baseline
 - Add confidence scoring
 - Save and load the trained model
 - Build an API using FastAPI
