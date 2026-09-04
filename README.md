@@ -17,23 +17,35 @@ The current goal is to classify customer-support messages into the correct inten
 
 ## Current Approach
 
-Customer-support messages are converted into numerical features using TF-IDF.
+The project currently compares two approaches for representing customer-support messages numerically:
 
-The project currently compares two machine-learning classifiers:
+- TF-IDF text features
+- Pretrained MiniLM sentence embeddings
+
+For classical machine learning, I compared:
 
 - Logistic Regression
 - Linear SVM
 
+TF-IDF + Linear SVM was selected as the best classical baseline.
+
+I then replaced TF-IDF with pretrained semantic embeddings generated using `all-MiniLM-L6-v2`. MiniLM embeddings combined with Linear SVM currently produce the best performance.
+
+
 ## Current Results
 
-| Model | Accuracy | Macro F1 |
-|---|---:|---:|
-| Logistic Regression | 87.78% | 87.77% |
-| Linear SVM | 89.47% | 89.45% |
+| Representation | Classifier | Accuracy | Macro F1 |
+|---|---|---:|---:|
+| TF-IDF | Logistic Regression | 87.78% | 87.77% |
+| TF-IDF | Linear SVM | 89.47% | 89.45% |
+| **MiniLM Embeddings** | **Linear SVM** | **92.95%** | **92.91%** |
 
-Linear SVM is currently the best-performing classical machine-learning model.
+MiniLM embeddings combined with Linear SVM currently achieve the best performance, with 92.95% accuracy and 92.91% Macro F1.
+
 
 ## Experiments
+
+### TF-IDF Experiments
 
 I tested both Logistic Regression and Linear SVM using two TF-IDF configurations:
 
@@ -51,7 +63,23 @@ Adding bigrams increased the number of TF-IDF features from 2,319 to 23,605.
 
 The additional bigram features did not improve either model. Logistic Regression performance decreased noticeably, while Linear SVM performance remained very similar but slightly lower.
 
-Because unigram TF-IDF produced fewer features while also achieving the best overall performance, I selected unigram TF-IDF with Linear SVM as the current classical machine-learning baseline.
+Because unigram TF-IDF used far fewer features while achieving the best TF-IDF performance, I selected unigram TF-IDF with Linear SVM as the classical machine-learning baseline.
+
+### Pretrained Embedding Experiment
+
+I then replaced TF-IDF with pretrained sentence embeddings generated using `all-MiniLM-L6-v2`.
+
+The same Linear SVM classifier was trained on the 384-dimensional dense sentence embeddings.
+
+| Representation | Classifier | Accuracy | Macro F1 |
+|---|---|---:|---:|
+| TF-IDF | Logistic Regression | 87.78% | 87.77% |
+| TF-IDF | Linear SVM | 89.47% | 89.45% |
+| **MiniLM Embeddings** | **Linear SVM** | **92.95%** | **92.91%** |
+
+Using pretrained sentence embeddings improved accuracy from 89.47% to 92.95% compared with the best TF-IDF model.
+
+The MiniLM embedding model is currently the best-performing approach.
 
 ## What I Learned
 
@@ -72,13 +100,18 @@ Error analysis showed that the model sometimes struggles to distinguish between 
 - `transfer_not_received_by_recipient`
 - `transfer_timing`
 
+I learned the difference between sparse TF-IDF vectors and dense pretrained sentence embeddings. Unlike TF-IDF, pretrained embeddings represent the semantic meaning of a sentence rather than mainly relying on word frequency.
+
+In this project, replacing TF-IDF with MiniLM embeddings improved Linear SVM accuracy from 89.47% to 92.95%.
+
 ## Next Steps
 
-- Test pretrained text embeddings
-- Compare pretrained embeddings with TF-IDF
+- Perform error analysis on the MiniLM embedding classifier
+- Compare weak categories against the TF-IDF baseline
+- Add confidence scoring
+- Save and load the trained model
 - Build an API using FastAPI
 - Store customer-support tickets in a database
 - Add priority classification
-- Add confidence scoring
 - Add LLM/RAG capabilities
 - Deploy the system
