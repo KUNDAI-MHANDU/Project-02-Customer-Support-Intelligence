@@ -6,7 +6,7 @@ An AI-powered system that will classify customer requests, determine the priorit
 
 ## Current Goal
 
-The current goal is to classify customer-support messages into the correct intent/category.
+The current goal is to build a production-style customer-support intelligence service that classifies incoming customer messages, returns a calibrated confidence score, and exposes predictions through a REST API.
 
 ## Dataset
 
@@ -76,11 +76,12 @@ The same Linear SVM classifier was trained on the 384-dimensional dense sentence
 |---|---|---:|---:|
 | TF-IDF | Logistic Regression | 87.78% | 87.77% |
 | TF-IDF | Linear SVM | 89.47% | 89.45% |
-| **MiniLM Embeddings** | **Linear SVM** | **92.95%** | **92.91%** |
+| MiniLM Embeddings | Linear SVM | **92.95%** | **92.91%** |
+| MiniLM Embeddings | Calibrated Linear SVM | 92.88% | 92.85% |
 
 Using pretrained sentence embeddings improved accuracy from 89.47% to 92.95% compared with the best TF-IDF model.
 
-The MiniLM embedding model is currently the best-performing approach.
+MiniLM embeddings combined with Linear SVM are currently the best-performing classification approach.
 
 ## API
 
@@ -89,6 +90,7 @@ The intent-classification system is exposed through a FastAPI REST API.
 ### Endpoint
 
 `POST /predict`
+The endpoint accepts a customer-support message and returns the predicted intent together with a calibrated confidence score.
 
 Example request:
 
@@ -96,6 +98,21 @@ Example request:
 {
   "text": "My virtual card keeps getting declined"
 }
+```
+
+Example response:
+
+```json
+{
+  "intent": "virtual_card_not_working",
+  "confidence": 0.7911729096745604
+}
+```
+
+### Input Validation
+
+The API validates incoming messages using Pydantic. Empty messages, whitespace-only messages, and messages exceeding the allowed length are rejected before reaching the machine-learning model.
+
 
 ## What I Learned
 
@@ -141,7 +158,6 @@ I learned how to expose a machine-learning model through a FastAPI REST API, val
 
 ## Next Steps
 
-- Add input validation and error handling
 - Add automated API and inference tests
 - Store customer-support tickets and predictions in PostgreSQL
 - Add priority classification
