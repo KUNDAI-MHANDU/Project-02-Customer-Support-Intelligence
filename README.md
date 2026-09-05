@@ -41,7 +41,7 @@ The prediction system is exposed through a FastAPI REST API using a `POST /predi
 
 MiniLM embeddings combined with Linear SVM achieved the highest classification performance.
 
-The calibrated version produced nearly identical classification performance while also providing probability-based confidence estimates for predictions.
+The calibrated version maintained nearly identical classification performance while also providing calibrated probability estimates that can be used as confidence scores.
 
 
 ## Experiments
@@ -114,6 +114,18 @@ Example response:
 The API validates incoming messages using Pydantic. Empty messages, whitespace-only messages, and messages exceeding the allowed length are rejected before reaching the machine-learning model.
 
 
+### Automated API Tests
+
+The API currently includes automated tests for:
+
+- Valid request → `200`
+- Empty message → `422`
+- Whitespace-only message → `422`
+- Message over 1000 characters → `422`
+
+All 4 tests currently pass using `pytest`.
+
+
 ## What I Learned
 
 I learned that machine-learning models cannot directly process customer messages as text, so the text first needs to be converted into numerical features.
@@ -153,12 +165,12 @@ I learned how to persist trained machine-learning models using `joblib` and load
 
 I also learned that Linear SVM decision scores are not probabilities. I used `CalibratedClassifierCV` to generate probability-based confidence estimates while maintaining similar classification performance.
 
-I learned how to expose a machine-learning model through a FastAPI REST API, validate incoming JSON requests with Pydantic, and return model predictions as JSON responses.
+I learned how to expose a machine-learning model through a FastAPI REST API, validate incoming JSON requests with Pydantic, return model predictions as JSON responses, and automate API test.
 
 
 ## Next Steps
 
-- Add automated API and inference tests
+
 - Store customer-support tickets and predictions in PostgreSQL
 - Add priority classification
 - Add routing logic for support departments
