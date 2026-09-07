@@ -22,6 +22,7 @@ class PredictionRequest(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    ticket_id: int
     intent: str
     confidence: float
 
@@ -36,10 +37,15 @@ def predict(request: PredictionRequest):
     )
 
     # Save the ticket to the database using the save_ticket function from src.database.crud
-    save_ticket(
+    ticket = save_ticket(
         text=request.text,
         predicted_intent=result["intent"],
         confidence=result["confidence"]
     )
 
-    return result
+    # Return the ticket ID, predicted intent, and confidence score in the response as a dictionary
+    return {
+        "ticket_id": ticket.id,
+        "intent": result["intent"],
+        "confidence": result["confidence"]
+    }

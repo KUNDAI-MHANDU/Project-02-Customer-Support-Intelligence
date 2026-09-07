@@ -13,7 +13,8 @@ def test_predict_valid_message():
 
     # Use the patch function from unittest.mock to mock the save_ticket function in src.api, so that it does not actually save tickets to the database during testing
      with patch("src.api.save_ticket") as mock_save_ticket:
-
+        # Define the return value of the mock_save_ticket function to simulate a saved ticket with an ID and created_at timestamp
+        mock_save_ticket.return_value.id = 123
         # Send a POST request to the /predict endpoint with a valid message and check the response
         response = client.post(
             "/predict",
@@ -29,12 +30,15 @@ def test_predict_valid_message():
         data = response.json()
 
         # Assert that the response data contains the expected keys and types
+        assert data["ticket_id"] == 123
         assert "intent" in data
         assert "confidence" in data
 
         # Assert that the intent is a string and the confidence is a float
         assert isinstance(data["intent"], str)
         assert isinstance(data["confidence"], float)
+
+
 
         # Assert that the mock_save_ticket function was called once with the expected arguments, including the text, predicted intent, and confidence
         mock_save_ticket.assert_called_once_with(
