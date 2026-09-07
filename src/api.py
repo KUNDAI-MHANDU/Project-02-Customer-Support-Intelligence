@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, StringConstraints
 
 from src.predict import predict_intent
+from src.database.crud import save_ticket
 
 # Create a FastAPI app and define the request and response models for the /predict endpoint
 app = FastAPI()
@@ -24,7 +25,7 @@ class PredictionResponse(BaseModel):
     intent: str
     confidence: float
 
-# Define the /predict endpoint for the FastAPI app, which takes a PredictionRequest and returns a PredictionResponse
+# Define the /predict endpoint, which takes a PredictionRequest and returns a PredictionResponse
 @app.post(
     "/predict",
     response_model=PredictionResponse
@@ -32,6 +33,13 @@ class PredictionResponse(BaseModel):
 def predict(request: PredictionRequest):
     result = predict_intent(
         message=request.text
+    )
+
+    # Save the ticket to the database using the save_ticket function from src.database.crud
+    save_ticket(
+        text=request.text,
+        predicted_intent=result["intent"],
+        confidence=result["confidence"]
     )
 
     return result
