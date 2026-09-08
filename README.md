@@ -251,7 +251,8 @@ I learned how to use the GET endpoint in FastAPI to return a record from the dat
 
 ## Next Steps
 
-- Add endpoints for retrieving stored tickets
+- Add `GET /tickets` to retrieve multiple stored tickets
+- Add pagination for ticket retrieval
 - Add priority classification
 - Add routing logic for support departments
 - Add LLM/RAG capabilities for generating support assistance
