@@ -27,15 +27,34 @@ def save_ticket(text, predicted_intent, confidence):
         # Return the saved ticket object, which now contains the ID and created_at timestamp
         return ticket
 
-# Test the save_ticket function by saving a sample ticket to the database and printing its ID and created_at timestamp
-if __name__ == "__main__":
-    # Save a sample ticket to the database using the save_ticket function
-    ticket = save_ticket(
-        text="The ATM did not give me my cash",
-        predicted_intent="cash_withdrawal",
-        confidence=0.87
-    )
+# Define a function to get a ticket by its ID from the database using SQLAlchemy's session management
+def get_ticket_by_id(ticket_id):
 
-    # Print the ID and created_at timestamp of the saved ticket to verify that it was successfully saved to the database
-    print("Ticket ID:", ticket.id)
-    print("Created at:", ticket.created_at)
+    # Use a context manager to create a new session and ensure that the session is properly closed after the operation
+    with SessionLocal() as session:
+
+        # Get the ticket with the specified ID from the session
+        ticket = session.get(
+            Ticket,
+            ticket_id
+        )
+        
+        # Return the ticket object
+        return ticket
+
+# Test the get_ticket_by_id functions
+if __name__ == "__main__":
+
+    # Get the ticket with ID 3 from the database
+    ticket = get_ticket_by_id(3)
+
+    # Print the ticket details
+    if ticket:
+        print("Ticket ID:", ticket.id)
+        print("Text:", ticket.text)
+        print("Intent:", ticket.predicted_intent)
+        print("Confidence:", ticket.confidence)
+        print("Created at:", ticket.created_at)
+    else:
+        # If the ticket is not found, print a message
+        print("Ticket not found")
